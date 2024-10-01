@@ -83,7 +83,17 @@ app.get("/", (req, res) => {
 
 //returns the list of all the users
 app.get("/users", (req, res) => {
-  res.send(users);
+  const name = req.query.name;
+  const job = req.query.job;
+  let filteredUsers = users["users_list"];
+
+  if(name && job){
+    filteredUsers = filteredUsers.filter(user => user.name == name && user.job == job);
+    
+  }else if(name) {
+    filteredUsers = filteredUsers.filter.filter(user => user.name == name);
+  }
+  res.send({user_list: filteredUsers});
 });
 
 app.post("/users", (req, res) => {
