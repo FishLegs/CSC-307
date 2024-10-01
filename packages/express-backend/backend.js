@@ -47,6 +47,10 @@ const addUser = (user) => {
   return user;
 };
 
+const removeUser = (id) =>
+  users["users_list"] = users["users_list"].filter(
+    user => user.id !== id
+    );
 
 
 app.get("/users/:id", (req, res) => {
@@ -86,6 +90,13 @@ app.post("/users", (req, res) => {
   const userToAdd = req.body;
   addUser(userToAdd);
   res.send();
+});
+
+app.delete("/users/:id", (req, res) => {
+  const userId= req.params.id;
+  removeUser(userId);
+  res.send();
+
 });
 
 app.listen(port, () => {
