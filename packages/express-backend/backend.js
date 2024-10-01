@@ -7,8 +7,13 @@ const users = {
   users_list: [
     {
       id: "xyz789",
+<<<<<<< HEAD
       name: "Fisher",
       job: "CEO"
+=======
+      name: "Charlie",
+      job: "Janitor"
+>>>>>>> origin
     },
     {
       id: "abc123",
