@@ -102,7 +102,7 @@ app.get("/users", (req, res) => {
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
   addUser(userToAdd);
-  res.send();
+  res.status(201).send({ message: "User created successfully", user: userToAdd });
 });
 
 app.delete("/users/:id", (req, res) => {

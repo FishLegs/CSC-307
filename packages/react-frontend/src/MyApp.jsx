@@ -22,7 +22,19 @@ function MyApp() {
         body: JSON.stringify(person),
       });
   
-      return promise;
+      return promise
+        .then((response) => {
+          if(response.status === 201){
+            console.log("User successfully created with status 201.");
+            return response.json();
+          } else {
+            console.log("Unexpected status code:", response.status);
+            throw new Error("Failed to create user");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     }
 
     function removeOneCharacter(index) {
@@ -34,10 +46,14 @@ function MyApp() {
 
     function updateList(person) { 
       postUser(person)
-        .then(() => setCharacters([...characters, person]))
+        .then((newUser) => {
+          if (newUser) {
+            setCharacters([...characters, newUser]);
+          }
+        })  
         .catch((error) => {
-          console.log(error);
-        })
+          console.error("Error in submission", error);
+        });
     }
   
 
