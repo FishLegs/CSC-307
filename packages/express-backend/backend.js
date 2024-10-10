@@ -1,6 +1,6 @@
 // backend.js
 import express from "express";
-
+import cors from "cors";
 const app = express();
 const port = 8000;
 const users = {
@@ -74,6 +74,8 @@ app.get("/users", (req, res) => {
   }
 });
 
+app.use(cors());
+
 app.use(express.json());
 
 //Sets up end Point to accept the get function
@@ -95,6 +97,7 @@ app.get("/users", (req, res) => {
   }
   res.send({user_list: filteredUsers});
 });
+
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
