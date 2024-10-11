@@ -43,9 +43,19 @@ const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
 const addUser = (user) => {
+  user.id = createRandomString(6)
   users["users_list"].push(user);
   return user;
 };
+
+function createRandomString(length) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
 
 const removeUser = (id) =>
   users["users_list"] = users["users_list"].filter(
@@ -101,8 +111,8 @@ app.get("/users", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.status(201).send({ message: "User created successfully", user: userToAdd });
+  const addedUser = addUser(userToAdd);
+  res.status(201).send({ message: "User created successfully", user: addedUser });
 });
 
 app.delete("/users/:id", (req, res) => {

@@ -44,16 +44,44 @@ function MyApp() {
           setCharacters(updated);
     }
 
+    function removeOneCharacter(index) {
+
+      const byeUser = characters[index];
+      const promise = fetch('Http://localhost:8000/users/${byeUser.id}', {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      promise
+      .then((response) => {
+        if (response.status === 204){
+          const updated = characters.filter((character, i) => {
+            return i !== index;
+          });
+          setCharacters(updated);
+          console.log(`User ${userToDelete.id} deleted successfully.`);
+
+        } else if (response.status === 404){
+          console.error("User not found");
+
+        }else{
+          console.error("Failed to delete");
+        }
+      })
+    }
+
     function updateList(person) { 
       postUser(person)
-        .then((newUser) => {
-          if (newUser) {
-            setCharacters([...characters, newUser]);
+        .then(() => {
+          if (person) {
+            setCharacters([...characters, person]);
           }
         })  
         .catch((error) => {
           console.error("Error in submission", error);
-        });
+        })
     }
   
 
