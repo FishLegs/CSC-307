@@ -74,9 +74,10 @@ function MyApp() {
 
     function updateList(person) { 
       postUser(person)
-        .then(() => {
-          if (person) {
-            setCharacters([...characters, person]);
+        .then((newUser) => {
+          if (newUser) {
+            console.log("New user received from backend:", newUser); 
+            setCharacters([...characters, newUser]);
           }
         })  
         .catch((error) => {
