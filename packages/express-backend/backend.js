@@ -1,76 +1,53 @@
 // backend.js
+import userService from './user-services.js';
 import express from "express";
 
 const app = express();
 const port = 8000;
-const users = {
-  users_list: [
-    {
-      id: "xyz789",
-      name: "Charlie",
-      job: "Janitor"
-    },
-    {
-      id: "abc123",
-      name: "Mac",
-      job: "Bouncer"
-    },
-    {
-      id: "ppp222",
-      name: "Mac",
-      job: "Professor"
-    },
-    {
-      id: "yat999",
-      name: "Dee",
-      job: "Aspring actress"
-    },
-    {
-      id: "zap555",
-      name: "Dennis",
-      job: "Bartender"
+
+  
+
+// const findUserByName = (name) => {
+//   return users["users_list"].filter(
+//     (user) => user["name"] === name
+//   );
+// };
+
+// const findUserById = (id) =>
+//   users["users_list"].find((user) => user["id"] === id);
+
+// const addUser = (user) => {
+//   users["users_list"].push(user);
+//   return user;
+// };
+
+// const removeUser = (id) =>
+//   users["users_list"] = users["users_list"].filter(
+//     user => user.id !== id
+//     );
+
+
+app.get("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await userService.findUserById(id);
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(user);
     }
-  ]
-};
-
-const findUserByName = (name) => {
-  return users["users_list"].filter(
-    (user) => user["name"] === name
-  );
-};
-
-const findUserById = (id) =>
-  users["users_list"].find((user) => user["id"] === id);
-
-const addUser = (user) => {
-  users["users_list"].push(user);
-  return user;
-};
-
-const removeUser = (id) =>
-  users["users_list"] = users["users_list"].filter(
-    user => user.id !== id
-    );
-
-
-app.get("/users/:id", (req, res) => {
-  const id = req.params["id"]; //or req.params.id
-  let result = findUserById(id);
-  if (result === undefined) {
-    res.status(404).send("Resource not found.");
-  } else {
-    res.send(result);
+  } catch (error) {
+    res.status(500).send("Error: " + error.message);
   }
 });
 
-app.get("/users", (req, res) => {
-  const name = req.query.name;
-  if (name != undefined) {
-    let result = findUserByName(name);
-    result = { users_list: result };
-    res.send(result);
-  } else {
-    res.send(users);
+app.get("/users", async (req, res) => {
+  const { name, job } = req.query;
+  try {
+    const users = await userService.getUsers(name, job);
+    res.send({ users_list: users });
+  } catch (error) {
+    res.status(500).send("Error: " + error.message);
   }
 });
 
@@ -81,32 +58,61 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-//returns the list of all the users
-app.get("/users", (req, res) => {
+
+app.get("/users", async (req, res) => {
   const name = req.query.name;
-  const job = req.query.job;
-  let filteredUsers = users["users_list"];
-
-  if(name && job){
-    filteredUsers = filteredUsers.filter(user => user.name == name && user.job == job);
-    
-  }else if(name) {
-    filteredUsers = filteredUsers.filter.filter(user => user.name == name);
+  if (name) {
+    try {
+      const users = await userService.findUserByName(name);
+      res.send({ user_list: users });
+    } catch (error) {
+      res.status(500).send({ error: "Failed to fetch users by name: " + error.message });
+    }
+  } else {
+    res.status(400).send({ error: "Name query parameter is required." });
   }
-  res.send({user_list: filteredUsers});
 });
 
-app.post("/users", (req, res) => {
+//http://localhost:8000/users?job=Manager
+app.get("/users/job", async (req, res) => {
+  const job = req.query.job;
+
+  if (job) {
+    try {
+      const users = await userService.findUserByJob(job);
+      res.send({ user_list: users });
+    } catch (error) {
+      res.status(500).send({ error: "Failed to fetch users by job: " + error.message });
+    }
+  } else {
+    res.status(400).send({ error: "Job query parameter is required." });
+  }
+});
+
+
+app.post("/users", async (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  try {
+    const user = await userService.addUser(userToAdd);
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(400).send("Error: " + error.message);
+  }
 });
 
-app.delete("/users/:id", (req, res) => {
+app.delete("/users/:id", async (req, res) => {
   const userId= req.params.id;
-  removeUser(userId);
-  res.send();
-
+  try {
+    const user = await userService.findUserById(userId);
+    if(user){
+      await userService.deleteById(userId);
+      res.status(204).send(user);
+    }else{
+      res.status(404).send("User not found");
+    }
+  } catch (error) {
+    res.status(500).send("Error: " + error.message);
+  }
 });
 
 app.listen(port, () => {
