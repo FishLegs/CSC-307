@@ -6,38 +6,9 @@ const app = express();
 const port = 8000;
 
 
-const findUserByName = (name) => {
-  return users["users_list"].filter(
-    (user) => user["name"] === name
-  );
-};
-
-const findUserById = (id) =>
-  users["users_list"].find((user) => user["id"] === id);
-
-const addUser = (user) => {
-  user.id = createRandomString(6)
-  users["users_list"].push(user);
-  return user;
-};
-
-function createRandomString(length) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
-const removeUser = (id) =>
-  users["users_list"] = users["users_list"].filter(
-    user => user.id !== id
-    );
-
 
 app.get("/users/:id", async (req, res) => {
-  const id = req.params["id"]; //or req.params.id
+  const id = req.params["id"]; 
   try {
     const user = await userService.findUserById(id);
     if (!user) {

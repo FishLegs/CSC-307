@@ -37,39 +37,30 @@ function MyApp() {
         });
     }
 
-    function removeOneCharacter(index) {
-        const updated = characters.filter((character, i) => {
-            return i !== index;
-          });
-          setCharacters(updated);
-    }
-
-    function removeOneCharacter(index) {
-
-      const byeUser = characters[index];
-      const promise = fetch('Http://localhost:8000/users/${byeUser.id}', {
+  
+    // Make DELETE request to backend
+    function removeCharacter(_id) {
+  
+      const promise = fetch(`http://localhost:8000/users/${_id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+    
       promise
-      .then((response) => {
-        if (response.status === 204){
-          const updated = characters.filter((character, i) => {
-            return i !== index;
-          });
-          setCharacters(updated);
-          console.log(`User ${userToDelete.id} deleted successfully.`);
-
-        } else if (response.status === 404){
-          console.error("User not found");
-
-        }else{
-          console.error("Failed to delete");
-        }
-      })
+        .then((response) => {
+          if (response.status === 204) {
+            const updated = characters.filter((character) => character._id !== _id);
+            setCharacters(updated);
+            console.log(`User ${_id} deleted successfully.`);
+          } else if (response.status === 404) {
+            console.error("User not found");
+          } else {
+            console.error("Failed to delete");
+          }
+        })
+        .catch((error) => console.error("Error:", error));
     }
 
     function updateList(person) { 
@@ -92,7 +83,7 @@ function MyApp() {
         <div className="container">
           <Table
             characterData={characters}
-            removeCharacter={removeOneCharacter}
+            removeCharacter={removeCharacter}
           />
           <Form
             handleSubmit={updateList}
